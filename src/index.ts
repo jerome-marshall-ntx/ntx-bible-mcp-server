@@ -1,13 +1,17 @@
 import { FastMCP } from "fastmcp"
 import { readFile } from "fs/promises"
-import { join, resolve } from "path"
+import { join, resolve, dirname } from "path"
+import { fileURLToPath } from "url"
+
+// Fix data directory path for both dev and production
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = dirname(__filename)
+const dataDir = resolve(__dirname, "data")
 
 const server = new FastMCP({
   name: "Nutanix Bible MCP",
   version: "1.0.0",
 })
-
-const dataDir = resolve("./data")
 
 // Tool definitions array
 const toolDefinitions = [
@@ -533,6 +537,12 @@ toolDefinitions.forEach(({ filename, name, description }) => {
 server.start({
   transportType: "httpStream",
   httpStream: {
-    port: 3000,
+    port: parseInt(process.env.PORT || "3000", 10),
   },
 })
+
+console.log(
+  `Nutanix Bible MCP Server running on port ${
+    process.env.PORT || 3000
+  } with endpoint /mcp`
+)
